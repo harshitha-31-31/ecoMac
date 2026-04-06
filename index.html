@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eco App</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #f4f4f4;
+}
+
+header {
+    background: green;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+
+.section {
+    display: none;
+    padding: 20px;
+    padding-bottom: 70px;
+}
+
+.active {
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px;
+    margin-top: 10px;
+    background: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#chatBox {
+    height: 250px;
+    overflow-y: auto;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.navbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    background: #222;
+}
+
+.navbar button {
+    flex: 1;
+    background: none;
+    color: white;
+}
+
+.navbar button:hover {
+    background: green;
+}
+</style>
+</head>
+
+<body>
+
+<header>🌱 Eco App</header>
+
+<div id="home" class="section active">
+    <h2>Home</h2>
+    <p>Welcome to Eco App 🌍</p>
+</div>
+
+<!-- INPUT -->
+<input type="text" id="userInput" placeholder="Type or speak...">
+
+<!-- BUTTONS -->
+<button onclick="sendMessage()">Send</button>
+<button onclick="startVoice()">🎤 Speak</button>
+  
+<div id="profile" class="section">
+    <h2>Profile</h2>
+    <p>Name: User</p>
+</div>
+
+<div class="navbar">
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('chat')">Chat</button>
+    
+    <button onclick="showSection('profile')">Profile</button>
+</div>
+
+<script>
+
+// Navigation
+function showSection(id) {
+    let sections = document.querySelectorAll(".section");
+    sections.forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+// Send Message
+function sendMessage() {
+    let inputBox = document.getElementById("userInput");
+    let chatBox = document.getElementById("chatBox");
+
+    let text = inputBox.value.trim();
+    if (text === "") return;
+
+    chatBox.innerHTML += "<p><b>You:</b> " + text + "</p>";
+
+    let reply = generateResponse(text);
+
+    chatBox.innerHTML += "<p><b>EcoBot:</b> " + reply + "</p>";
+
+    inputBox.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Chatbot Logic
+function generateResponse(input) {
+
+    let text = input.toLowerCase();
+
+    if (text.includes("hi") || text.includes("hello")) {
+        return "Hello 👋! Welcome to Eco App 🌱.";
+    }
+
+    else if (text.includes("plastic bottle")) {
+        return "♻️ Plastic Bottle<br>🗑 Recycle<br>🏭 Packaging<br>📊 80% recyclable";
+    }
+
+    else if (text.includes("plastic")) {
+        return "♻️ Plastic Waste<br>🗑 Recycle<br>🏭 Packaging<br>📊 60-80% recyclable";
+    }
+
+    else if (text.includes("paper")) {
+        return "♻️ Paper Waste<br>🗑 Recycle<br>🏭 Paper mills<br>📊 70-90% recyclable";
+    }
+
+    else if (text.includes("glass")) {
+        return "♻️ Glass Waste<br>🗑 Recycle<br>🏭 Bottle industry<br>📊 90-100% recyclable";
+    }
+
+    else if (text.includes("metal")) {
+        return "♻️ Metal Waste<br>🗑 Recycle<br>🏭 Construction<br>📊 90-100% recyclable";
+    }
+
+    else if (text.includes("food")) {
+        return "♻️ Food Waste<br>🗑 Compost<br>🏭 Agriculture<br>📊 80-90% reusable";
+    }
+
+    else if (text.includes("wood")) {
+        return "♻️ Wood Waste<br>🗑 Reuse<br>🏭 Furniture<br>📊 70-90% reusable";
+    }
+
+    else if (text.includes("e-waste") || text.includes("electronics")) {
+        return "♻️ E-Waste<br>🗑 Special Recycling<br>🏭 Electronic units<br>📊 50-70% recyclable";
+    }
+
+    else if (text.includes("battery")) {
+        return "♻️ Battery Waste<br>🗑 Hazardous disposal<br>🏭 Recycling plants<br>📊 60-80% recyclable";
+    }
+
+    else if (text.includes("rubber")) {
+        return "♻️ Rubber Waste<br>🗑 Recycle<br>🏭 Tyre industry<br>📊 60-70% reusable";
+    }
+
+    else if (text.includes("cloth") || text.includes("textile")) {
+        return "♻️ Textile Waste<br>🗑 Reuse/Recycle<br>🏭 Garment industry<br>📊 50-80% reusable";
+    }
+
+    else if (text.includes("organic")) {
+        return "♻️ Organic Waste<br>🗑 Compost<br>🏭 Farming<br>📊 90% reusable";
+    }
+
+    else if (text.includes("mobile")) {
+        return "♻️ Mobile Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 70-90% recyclable";
+    }
+    if (text.includes("laptop")) {
+        return "♻️ Laptop Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 70-90% recyclable";
+    }
+
+    else if (text.includes("detergent")) {
+        return "♻️ Detergent Waste<br>🗑 Dispose<br>🏭 Cleaning industry<br>📊 Limited recycling";
+    }
+else if (text.includes("tyre")) {
+    return "♻️ Tyre Waste<br>🗑 Recycle<br>🏭 Road/Construction<br>📊 70-80% reusable";
+}
+
+else if (text.includes("car")) {
+    return "♻️ Car Waste<br>🗑 Scrap recycle<br>🏭 Automobile<br>📊 80-90% recyclable";
+}
+
+else if (text.includes("engine oil")) {
+    return "♻️ Engine Oil<br>🗑 Recycle<br>🏭 Fuel industry<br>📊 60-70% reusable";
+}
+
+else if (text.includes("fuel")) {
+    return "♻️ Fuel Waste<br>🗑 Safe disposal<br>🏭 Energy sector<br>📊 Limited reuse";
+}
+
+else if (text.includes("grease")) {
+    return "♻️ Grease Waste<br>🗑 Recycle<br>🏭 Machinery<br>📊 40-60% reusable";
+}
+
+else if (text.includes("wax")) {
+    return "♻️ Wax Waste<br>🗑 Reuse<br>🏭 Candle industry<br>📊 60-80% reusable";
+}
+
+else if (text.includes("candle")) {
+    return "♻️ Candle Waste<br>🗑 Reuse<br>🏭 Household<br>📊 50-70% reusable";
+}
+
+else if (text.includes("soap")) {
+    return "♻️ Soap Waste<br>🗑 Reuse<br>🏭 Hygiene products<br>📊 40-60% reusable";
+}
+
+else if (text.includes("detergent")) {
+    return "♻️ Detergent Waste<br>🗑 Dispose<br>🏭 Chemical<br>📊 Limited recycling";
+}
+
+else if (text.includes("shampoo")) {
+    return "♻️ Shampoo Bottle<br>🗑 Recycle<br>🏭 Plastic<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("perfume")) {
+    return "♻️ Perfume Bottle<br>🗑 Recycle<br>🏭 Glass<br>📊 80-90% recyclable";
+}
+
+else if (text.includes("cosmetic")) {
+    return "♻️ Cosmetic Waste<br>🗑 Special disposal<br>🏭 Beauty industry<br>📊 30-50% recyclable";
+}
+
+else if (text.includes("lipstick")) {
+    return "♻️ Lipstick Waste<br>🗑 Dispose<br>🏭 Cosmetic<br>📊 Limited recycling";
+}
+
+else if (text.includes("foundation")) {
+    return "♻️ Foundation Bottle<br>🗑 Recycle<br>🏭 Cosmetic<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("nail polish")) {
+    return "♻️ Nail Polish<br>🗑 Hazardous disposal<br>🏭 Chemical<br>📊 Not recyclable";
+}
+
+else if (text.includes("brush")) {
+    return "♻️ Brush Waste<br>🗑 Recycle<br>🏭 Plastic<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("broom")) {
+    return "♻️ Broom Waste<br>🗑 Compost<br>🏭 Organic<br>📊 60-80% biodegradable";
+}
+
+else if (text.includes("dustbin")) {
+    return "♻️ Dustbin Waste<br>🗑 Recycle<br>🏭 Plastic<br>📊 70% recyclable";
+}
+
+else if (text.includes("net")) {
+    return "♻️ Net Waste<br>🗑 Recycle<br>🏭 Fishing/Plastic<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("fishing line")) {
+    return "♻️ Fishing Line<br>🗑 Recycle<br>🏭 Plastic<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("helmet visor")) {
+    return "♻️ Helmet Visor<br>🗑 Recycle<br>🏭 Plastic<br>📊 50% recyclable";
+}
+
+else if (text.includes("seat")) {
+    return "♻️ Seat Foam<br>🗑 Reuse<br>🏭 Furniture<br>📊 40-60% reusable";
+}
+
+else if (text.includes("cushion")) {
+    return "♻️ Cushion Waste<br>🗑 Reuse<br>🏭 Furniture<br>📊 50-70% reusable";
+}
+
+else if (text.includes("mattress")) {
+    return "♻️ Mattress Waste<br>🗑 Recycle<br>🏭 Furniture<br>📊 60-80% reusable";
+}
+
+else if (text.includes("fan blade")) {
+    return "♻️ Fan Blade<br>🗑 Recycle<br>🏭 Electrical<br>📊 70% recyclable";
+}
+
+else if (text.includes("pipe")) {
+    return "♻️ Pipe Waste<br>🗑 Recycle<br>🏭 Construction<br>📊 70-90% recyclable";
+}
+
+else if (text.includes("tap")) {
+    return "♻️ Tap Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 80% recyclable";
+}
+
+else if (text.includes("sink")) {
+    return "♻️ Sink Waste<br>🗑 Reuse<br>🏭 Construction<br>📊 60% reusable";
+}
+
+else if (text.includes("toilet")) {
+    return "♻️ Toilet Waste<br>🗑 Reuse<br>🏭 Construction<br>📊 50% reusable";
+}
+
+else if (text.includes("bath tub")) {
+    return "♻️ Bath Tub<br>🗑 Reuse<br>🏭 Construction<br>📊 60% reusable";
+}
+
+else if (text.includes("door")) {
+    return "♻️ Door Waste<br>🗑 Reuse<br>🏭 Furniture<br>📊 70-90% reusable";
+}
+
+else if (text.includes("window")) {
+    return "♻️ Window Waste<br>🗑 Reuse<br>🏭 Construction<br>📊 70% reusable";
+}
+
+else if (text.includes("frame")) {
+    return "♻️ Frame Waste<br>🗑 Reuse<br>🏭 Furniture<br>📊 60% reusable";
+}
+
+else if (text.includes("mirror frame")) {
+    return "♻️ Mirror Frame<br>🗑 Reuse<br>🏭 Furniture<br>📊 60% reusable";
+}
+
+else if (text.includes("lock")) {
+    return "♻️ Lock Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 80% recyclable";
+}
+
+else if (text.includes("key")) {
+    return "♻️ Key Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 90% recyclable";
+}
+
+else if (text.includes("chain")) {
+    return "♻️ Chain Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 90% recyclable";
+}
+
+else if (text.includes("ring")) {
+    return "♻️ Ring Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 90% recyclable";
+}
+
+else if (text.includes("jewellery")) {
+    return "♻️ Jewellery Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 90-100% recyclable";
+}
+else if (text.includes("ink")) {
+    return "♻️ Ink Waste<br>🗑 Special disposal<br>🏭 Printing industry<br>📊 Limited recycling";
+}
+
+else if (text.includes("toner")) {
+    return "♻️ Toner Cartridge<br>🗑 Refill/Recycle<br>🏭 Printing units<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("cd")) {
+    return "♻️ CD Waste<br>🗑 Recycle<br>🏭 Plastic industry<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("dvd")) {
+    return "♻️ DVD Waste<br>🗑 Recycle<br>🏭 Plastic industry<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("cassette")) {
+    return "♻️ Cassette Waste<br>🗑 Recycle<br>🏭 E-waste<br>📊 30-50% recyclable";
+}
+
+else if (text.includes("floppy")) {
+    return "♻️ Floppy Disk<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 Limited recycling";
+}
+
+else if (text.includes("printer")) {
+    return "♻️ Printer Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("scanner")) {
+    return "♻️ Scanner Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 60% recyclable";
+}
+
+else if (text.includes("router")) {
+    return "♻️ Router Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("modem")) {
+    return "♻️ Modem Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("keyboard cover")) {
+    return "♻️ Keyboard Cover<br>🗑 Recycle<br>🏭 Plastic<br>📊 60% recyclable";
+}
+
+else if (text.includes("screen")) {
+    return "♻️ Screen Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("laptop")) {
+    return "♻️ Laptop Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 70-90% recyclable";
+}
+
+else if (text.includes("mobile")) {
+    return "♻️ Mobile Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 70-90% recyclable";
+}
+
+else if (text.includes("tablet")) {
+    return "♻️ Tablet Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("earphones")) {
+    return "♻️ Earphones Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("headphones")) {
+    return "♻️ Headphones Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("watch")) {
+    return "♻️ Watch Waste<br>🗑 Recycle<br>🏭 Electronics<br>📊 50% recyclable";
+}
+
+else if (text.includes("clock")) {
+    return "♻️ Clock Waste<br>🗑 Recycle<br>🏭 Electronics<br>📊 50% recyclable";
+}
+
+else if (text.includes("pen")) {
+    return "♻️ Pen Waste<br>🗑 Recycle<br>🏭 Plastic<br>📊 30-50% recyclable";
+}
+
+else if (text.includes("pencil")) {
+    return "♻️ Pencil Waste<br>🗑 Compost<br>🏭 Organic<br>📊 60-80% biodegradable";
+}
+
+else if (text.includes("eraser")) {
+    return "♻️ Eraser Waste<br>🗑 Dispose<br>🏭 Rubber<br>📊 Limited recycling";
+}
+
+else if (text.includes("sharpener")) {
+    return "♻️ Sharpener Waste<br>🗑 Recycle<br>🏭 Metal/Plastic<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("chalk")) {
+    return "♻️ Chalk Waste<br>🗑 Dispose<br>🏭 Education<br>📊 Not recyclable";
+}
+
+else if (text.includes("board")) {
+    return "♻️ Board Waste<br>🗑 Reuse<br>🏭 Furniture<br>📊 60% reusable";
+}
+
+else if (text.includes("marker")) {
+    return "♻️ Marker Waste<br>🗑 Dispose<br>🏭 Plastic<br>📊 Limited recycling";
+}
+
+else if (text.includes("glue")) {
+    return "♻️ Glue Waste<br>🗑 Dispose<br>🏭 Chemical<br>📊 Limited recycling";
+}
+
+else if (text.includes("tape")) {
+    return "♻️ Tape Waste<br>🗑 Dispose<br>🏭 Packaging<br>📊 Limited recycling";
+}
+
+else if (text.includes("sticker")) {
+    return "♻️ Sticker Waste<br>🗑 Dispose<br>🏭 Packaging<br>📊 Not recyclable";
+}
+
+else if (text.includes("label")) {
+    return "♻️ Label Waste<br>🗑 Dispose<br>🏭 Packaging<br>📊 Limited recycling";
+}
+
+else if (text.includes("wrapper")) {
+    return "♻️ Wrapper Waste<br>🗑 Dispose<br>🏭 Packaging<br>📊 Not recyclable";
+}
+
+else if (text.includes("chips packet")) {
+    return "♻️ Chips Packet<br>🗑 Dispose<br>🏭 Plastic<br>📊 Not recyclable";
+}
+
+else if (text.includes("biscuit packet")) {
+    return "♻️ Biscuit Packet<br>🗑 Dispose<br>🏭 Packaging<br>📊 Not recyclable";
+}
+
+else if (text.includes("milk packet")) {
+    return "♻️ Milk Packet<br>🗑 Recycle<br>🏭 Plastic<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("water packet")) {
+    return "♻️ Water Packet<br>🗑 Recycle<br>🏭 Plastic<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("ice cream cup")) {
+    return "♻️ Ice Cream Cup<br>🗑 Dispose<br>🏭 Plastic<br>📊 Limited recycling";
+}
+
+else if (text.includes("straw")) {
+    return "♻️ Straw Waste<br>🗑 Dispose<br>🏭 Plastic<br>📊 Not recyclable";
+}
+
+else if (text.includes("cup")) {
+    return "♻️ Cup Waste<br>🗑 Reuse/Recycle<br>🏭 Household<br>📊 60% reusable";
+}
+
+else if (text.includes("paper cup")) {
+    return "♻️ Paper Cup<br>🗑 Dispose<br>🏭 Packaging<br>📊 Limited recycling";
+}
+else if (text.includes("ash")) {
+    return "♻️ Ash Waste<br>🗑 Landfill<br>🏭 Construction<br>📊 30-50% reusable";
+}
+
+else if (text.includes("coal")) {
+    return "♻️ Coal Waste<br>🗑 Disposal<br>🏭 Energy sector<br>📊 Limited reuse";
+}
+
+else if (text.includes("sand")) {
+    return "♻️ Sand Waste<br>🗑 Reuse<br>🏭 Construction<br>📊 60-80% reusable";
+}
+
+else if (text.includes("dust")) {
+    return "♻️ Dust Waste<br>🗑 Dispose<br>🏭 Cleaning<br>📊 Not recyclable";
+}
+
+else if (text.includes("gravel")) {
+    return "♻️ Gravel Waste<br>🗑 Reuse<br>🏭 Construction<br>📊 70% reusable";
+}
+
+else if (text.includes("stone")) {
+    return "♻️ Stone Waste<br>🗑 Reuse<br>🏭 Building<br>📊 80% reusable";
+}
+
+else if (text.includes("plastic bottle")) {
+    return "♻️ Plastic Bottle<br>🗑 Recycle<br>🏭 Packaging<br>📊 80% recyclable";
+}
+
+else if (text.includes("glass bottle")) {
+    return "♻️ Glass Bottle<br>🗑 Recycle<br>🏭 Beverage industry<br>📊 95% recyclable";
+}
+
+else if (text.includes("can")) {
+    return "♻️ Can Waste<br>🗑 Recycle<br>🏭 Metal industry<br>📊 90% recyclable";
+}
+
+else if (text.includes("lid")) {
+    return "♻️ Lid Waste<br>🗑 Recycle<br>🏭 Packaging<br>📊 60% recyclable";
+}
+
+else if (text.includes("sponge")) {
+    return "♻️ Sponge Waste<br>🗑 Dispose<br>🏭 Cleaning<br>📊 Limited recycling";
+}
+
+else if (text.includes("toothbrush")) {
+    return "♻️ Toothbrush Waste<br>🗑 Dispose<br>🏭 Plastic recycle<br>📊 20-30% recyclable";
+}
+
+else if (text.includes("toothpaste")) {
+    return "♻️ Toothpaste Tube<br>🗑 Special recycle<br>🏭 Packaging<br>📊 20-40% recyclable";
+}
+
+else if (text.includes("comb")) {
+    return "♻️ Comb Waste<br>🗑 Recycle<br>🏭 Plastic industry<br>📊 40-60% recyclable";
+}
+
+else if (text.includes("mirror")) {
+    return "♻️ Mirror Waste<br>🗑 Special disposal<br>🏭 Glass units<br>📊 Limited recycling";
+}
+
+else if (text.includes("bulb")) {
+    return "♻️ Bulb Waste<br>🗑 Hazardous disposal<br>🏭 Recycling plants<br>📊 30-50% recyclable";
+}
+
+else if (text.includes("tube light")) {
+    return "♻️ Tube Light<br>🗑 Special disposal<br>🏭 E-waste plants<br>📊 Limited recycling";
+}
+
+else if (text.includes("keyboard")) {
+    return "♻️ Keyboard Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("mouse")) {
+    return "♻️ Mouse Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("charger")) {
+    return "♻️ Charger Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 50-70% recyclable";
+}
+
+else if (text.includes("speaker")) {
+    return "♻️ Speaker Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 60% recyclable";
+}
+
+else if (text.includes("tv")) {
+    return "♻️ TV Waste<br>🗑 E-waste recycle<br>🏭 Electronics<br>📊 60-80% recyclable";
+}
+
+else if (text.includes("fan")) {
+    return "♻️ Fan Waste<br>🗑 Recycle<br>🏭 Electrical<br>📊 70-80% recyclable";
+}
+
+else if (text.includes("motor")) {
+    return "♻️ Motor Waste<br>🗑 Recycle<br>🏭 Industrial<br>📊 70% recyclable";
+}
+
+else if (text.includes("helmet")) {
+    return "♻️ Helmet Waste<br>🗑 Dispose<br>🏭 Safety gear<br>📊 Limited recycling";
+}
+
+else if (text.includes("shoe")) {
+    return "♻️ Shoe Waste<br>🗑 Reuse/Recycle<br>🏭 Footwear<br>📊 40-60% reusable";
+}
+
+else if (text.includes("bag")) {
+    return "♻️ Bag Waste<br>🗑 Reuse<br>🏭 Textile<br>📊 60-80% reusable";
+}
+
+else if (text.includes("belt")) {
+    return "♻️ Belt Waste<br>🗑 Reuse<br>🏭 Accessories<br>📊 50% reusable";
+}
+
+else if (text.includes("cap")) {
+    return "♻️ Cap Waste<br>🗑 Reuse<br>🏭 Textile<br>📊 60% reusable";
+}
+
+else if (text.includes("mat")) {
+    return "♻️ Mat Waste<br>🗑 Reuse<br>🏭 Household<br>📊 50% reusable";
+}
+
+else if (text.includes("pillow")) {
+    return "♻️ Pillow Waste<br>🗑 Reuse<br>🏭 Textile<br>📊 40-60% reusable";
+}
+
+else if (text.includes("blanket")) {
+    return "♻️ Blanket Waste<br>🗑 Reuse<br>🏭 Textile<br>📊 60% reusable";
+}
+
+else if (text.includes("curtain")) {
+    return "♻️ Curtain Waste<br>🗑 Reuse<br>🏭 Textile<br>📊 60% reusable";
+}
+
+else if (text.includes("rope")) {
+    return "♻️ Rope Waste<br>🗑 Reuse<br>🏭 Agriculture<br>📊 50% reusable";
+}
+
+else if (text.includes("bucket")) {
+    return "♻️ Bucket Waste<br>🗑 Recycle<br>🏭 Plastic<br>📊 70% recyclable";
+}
+
+else if (text.includes("mug")) {
+    return "♻️ Mug Waste<br>🗑 Reuse<br>🏭 Household<br>📊 60% reusable";
+}
+
+else if (text.includes("plate")) {
+    return "♻️ Plate Waste<br>🗑 Reuse<br>🏭 Household<br>📊 60% reusable";
+}
+
+else if (text.includes("spoon")) {
+    return "♻️ Spoon Waste<br>🗑 Reuse<br>🏭 Kitchen<br>📊 70% reusable";
+}
+
+else if (text.includes("fork")) {
+    return "♻️ Fork Waste<br>🗑 Reuse<br>🏭 Kitchen<br>📊 70% reusable";
+}
+
+else if (text.includes("knife")) {
+    return "♻️ Knife Waste<br>🗑 Recycle<br>🏭 Metal<br>📊 80% recyclable";
+}
+    else {
+        return "❓ Sorry, I don't have info on that. Try another waste item!";
+    }
+}
+
+// Enter key support
+document.getElementById("userInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        sendMessage();
+    }
+});
+
+</script>
+
+</body>
+</html>
