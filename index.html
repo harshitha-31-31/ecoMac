@@ -7,6 +7,26 @@
 
 <style>
 /* CSS Reset & Variables */
+#chatBox {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+#scrollBtn {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    border: none;
+    background: green;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: none;
+}
 * {
     margin: 0;
     padding: 0;
@@ -386,12 +406,64 @@ input:focus {
 .hidden {
     display: none !important;
 }
+#historyBtn {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+}
+
+/* History Panel */
+#historyPanel {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 250px;
+    height: calc(100% - 56px);
+    background: white;
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: 0.3s;
+    z-index: 200;
+    padding: 10px;
+}
+
+#historyPanel.active {
+    transform: translateX(0);
+}
+
+#historyPanel h3 {
+    margin-bottom: 10px;
+    color: var(--primary);
+}
+
+#historyPanel ul {
+    list-style: none;
+}
+
+#historyPanel li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
-<header>Eco App</header>
+<header>
+    <button id="historyBtn" onclick="toggleHistory()">☰</button>
+    Eco App
+</header>
+<div id="historyPanel">
+    <h3>History</h3>
+    <ul id="historyList"></ul>
+</div>
 
 <main>
     <!-- HOME SECTION -->
@@ -421,48 +493,56 @@ input:focus {
             </div>
         </div>
     </div>
-
-    <!-- CHAT SECTION -->
-    <div id="chat" class="section">
-        <div class="chat-container" id="chatBox">
+<div id="chat"class="section">
+    <div class="chat-container"id="chatBox">
             <div class="welcome-message">
                 <span class="icon">🌱</span>
                 <p>Ask me about any waste item!<br>Example: "plastic bottle", "food waste"</p>
+                <ul id="historyList"></ul>
+                <button id="scrollBtn" onclick="scrollToBottom()">⬇️</button>
             </div>
-        </div>
-
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="Type a message...">
-            </div>
-            <button class="btn-icon voice" onclick="startVoice()" title="Voice input">🎤</button>
-            <button class="btn-icon" onclick="sendMessage()" title="Send">➤</button>
         </div>
     </div>
 
-    <!-- PROFILE SECTION -->
+<div id="chat" class="section">
+
+    <div class="chat-container" id="chatBox">
+        ...
+    </div>
+
+    <!-- ✅ PASTE HERE -->
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="Type a message...">
+        </div>
+        <button class="btn-icon voice" onclick="startVoice()">🎤</button>
+        <button class="btn-icon" onclick="sendMessage()">➤</button>
+    </div>
+
+</div>
+
     <div id="profile" class="section">
-        <div class="profile-header">
-            <div class="avatar">👤</div>
-            <h3>Eco User</h3>
-            <p>Joined 2024</p>
-        </div>
+    <div class="profile-header">
+        <div class="avatar">👤</div>
+        <h3>Eco User</h3>
+        <p>Joined 2024</p>
+    </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <div class="number">0</div>
-                <div class="label">Queries</div>
-            </div>
-            <div class="stat-card">
-                <div class="number">0</div>
-                <div class="label">Items</div>
-            </div>
-            <div class="stat-card">
-                <div class="number">0</div>
-                <div class="label">Streak</div>
-            </div>
+    <div class="stats">
+        <div class="stat-card">
+            <div class="number">0</div>
+            <div class="label">Queries</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">0</div>
+            <div class="label">Items</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">0</div>
+            <div class="label">Streak</div>
         </div>
     </div>
+</div>
 </main>
 
 <!-- NAVBAR -->
@@ -478,8 +558,8 @@ input:focus {
     <button class="nav-btn" onclick="showSection('profile')">
         <span class="nav-icon">👤</span>
         <span>Profile</span>
-    </button>
-</div>
+    </div>
+
 
 <script>
 
@@ -496,8 +576,9 @@ function showSection(id) {
 function sendMessage() {
     let inputBox = document.getElementById("userInput");
     let chatBox = document.getElementById("chatBox");
-
+    
     let text = inputBox.value.trim();
+    
     if (text === "") return;
 
     // Add user message
@@ -508,10 +589,17 @@ function sendMessage() {
 
     // Get and add bot response
     let reply = generateResponse(text);
-    let botMsg = document.createElement('div');
-    botMsg.className = 'message bot';
-    botMsg.innerHTML = reply;
-    chatBox.appendChild(botMsg);
+
+let botMsg = document.createElement('div');
+botMsg.className = 'message bot';
+botMsg.innerHTML = reply;
+chatBox.appendChild(botMsg);
+
+// ✅ SAVE FULL CHAT (USER + BOT)
+saveToHistory({
+    user: text,
+    bot: reply
+});
 
     inputBox.value = "";
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -524,6 +612,57 @@ function generateResponse(input) {
     if (text.includes("hi") || text.includes("hello")) {
         return "Hello! Welcome to Eco App. 🌱<br><br>Ask me about any waste item and I'll tell you how to recycle it!";
     }
+    // GREETINGS
+else if (text.includes("hi") || text.includes("hello") || text.includes("hey")) {
+    return `
+    👋 <b>Hello!</b><br>
+    I'm your Eco Assistant 🌱<br>
+    Ask me about any waste item like:<br>
+    • plastic<br>
+    • paper<br>
+    • bottle<br>
+    • mobile phone
+    `;
+}
+
+else if (text.includes("good morning")) {
+    return `
+    ☀️ <b>Good Morning!</b><br>
+    Start your day by managing waste wisely 🌱
+    `;
+}
+
+else if (text.includes("good afternoon")) {
+    return `
+    🌤️ <b>Good Afternoon!</b><br>
+    Need help with waste recycling? I'm here!
+    `;
+}
+
+else if (text.includes("good evening")) {
+    return `
+    🌙 <b>Good Evening!</b><br>
+    Let's make the planet cleaner together 🌍
+    `;
+}
+
+else if (text.includes("how are you")) {
+    return `
+    😊 I'm doing great!<br>
+    Ready to help you with waste management ♻️
+    `;
+}
+
+else if (text.includes("help")) {
+    return `
+    🆘 <b>Help Menu</b><br>
+    You can ask about:<br>
+    • Plastic, Paper, Glass, Metal<br>
+    • Food, Organic waste<br>
+    • Electronics (mobile, laptop)<br><br>
+    Example: <i>"plastic bottle"</i>
+    `;
+}
 
     else if (text.includes("plastic bottle")) {
         return formatResponse("Plastic Bottle", "Recycle", "Packaging", "80% recyclable");
@@ -1032,6 +1171,455 @@ function generateResponse(input) {
     else if (text.includes("knife")) {
         return formatResponse("Knife Waste", "Recycle", "Metal", "80% recyclable");
     }
+    else if (text.includes("apple peel")) {
+    return formatResponse("Apple Peel", "Compost", "Organic", "100% biodegradable");
+}
+
+else if (text.includes("orange peel")) {
+    return formatResponse("Orange Peel", "Compost", "Organic", "100% biodegradable");
+}
+
+else if (text.includes("tea leaves")) {
+    return formatResponse("Tea Leaves", "Compost", "Farming", "100% biodegradable");
+}
+
+else if (text.includes("coffee grounds")) {
+    return formatResponse("Coffee Grounds", "Compost", "Agriculture", "100% reusable");
+}
+
+else if (text.includes("egg shell")) {
+    return formatResponse("Egg Shell", "Compost", "Fertilizer", "100% biodegradable");
+}
+
+else if (text.includes("fish waste")) {
+    return formatResponse("Fish Waste", "Compost", "Farming", "90% reusable");
+}
+
+else if (text.includes("meat waste")) {
+    return formatResponse("Meat Waste", "Compost", "Agriculture", "80% reusable");
+}
+
+else if (text.includes("bread")) {
+    return formatResponse("Bread Waste", "Compost", "Organic", "90% reusable");
+}
+
+else if (text.includes("rice")) {
+    return formatResponse("Rice Waste", "Compost", "Farming", "90% reusable");
+}
+
+else if (text.includes("vegetable waste")) {
+    return formatResponse("Vegetable Waste", "Compost", "Organic", "100% biodegradable");
+}
+
+else if (text.includes("flower waste")) {
+    return formatResponse("Flower Waste", "Compost", "Temple/Organic", "100% reusable");
+}
+
+else if (text.includes("leaves")) {
+    return formatResponse("Dry Leaves", "Compost", "Farming", "100% biodegradable");
+}
+
+else if (text.includes("grass")) {
+    return formatResponse("Grass Waste", "Compost", "Agriculture", "100% reusable");
+}
+
+else if (text.includes("hair")) {
+    return formatResponse("Hair Waste", "Reuse", "Farming", "70% reusable");
+}
+
+else if (text.includes("nails")) {
+    return formatResponse("Nail Waste", "Dispose", "Personal care", "Not recyclable");
+}
+else if (text.includes("coconut shell")) {
+    return formatResponse("Coconut Shell", "Reuse", "Craft/Fuel", "80-90% reusable");
+}
+
+else if (text.includes("coconut husk")) {
+    return formatResponse("Coconut Husk", "Reuse", "Coir industry", "90% reusable");
+}
+
+else if (text.includes("areca plate")) {
+    return formatResponse("Areca Plate", "Compost", "Organic", "100% biodegradable");
+}
+
+else if (text.includes("banana leaf")) {
+    return formatResponse("Banana Leaf", "Compost", "Organic", "100% biodegradable");
+}
+
+else if (text.includes("sugarcane bagasse")) {
+    return formatResponse("Bagasse Waste", "Reuse", "Paper industry", "90% reusable");
+}
+
+else if (text.includes("matchstick")) {
+    return formatResponse("Matchstick Waste", "Compost", "Wood", "80% biodegradable");
+}
+
+else if (text.includes("matchbox")) {
+    return formatResponse("Matchbox Waste", "Recycle", "Paper", "70% recyclable");
+}
+
+else if (text.includes("incense stick")) {
+    return formatResponse("Incense Stick Waste", "Compost", "Organic", "80% biodegradable");
+}
+
+else if (text.includes("agarbatti ash")) {
+    return formatResponse("Agarbatti Ash", "Dispose", "Religious", "Limited reuse");
+}
+
+else if (text.includes("camphor")) {
+    return formatResponse("Camphor Residue", "Dispose", "Religious", "Not recyclable");
+}
+
+else if (text.includes("plastic cover")) {
+    return formatResponse("Plastic Cover", "Recycle", "Packaging", "60% recyclable");
+}
+
+else if (text.includes("ziplock bag")) {
+    return formatResponse("Ziplock Bag", "Recycle", "Plastic", "50-70% recyclable");
+}
+
+else if (text.includes("bubble wrap")) {
+    return formatResponse("Bubble Wrap", "Reuse", "Packaging", "70% reusable");
+}
+
+else if (text.includes("courier cover")) {
+    return formatResponse("Courier Cover", "Recycle", "Plastic/Paper", "60% recyclable");
+}
+
+else if (text.includes("gift wrapper")) {
+    return formatResponse("Gift Wrapper", "Recycle", "Paper", "50-70% recyclable");
+}
+
+else if (text.includes("ribbon")) {
+    return formatResponse("Ribbon Waste", "Reuse", "Decoration", "70% reusable");
+}
+
+else if (text.includes("balloon")) {
+    return formatResponse("Balloon Waste", "Dispose", "Rubber", "Not recyclable");
+}
+
+else if (text.includes("thermometer")) {
+    return formatResponse("Thermometer Waste", "Hazardous disposal", "Medical", "Not recyclable");
+}
+
+else if (text.includes("cotton")) {
+    return formatResponse("Cotton Waste", "Compost", "Medical/Textile", "90% biodegradable");
+}
+
+else if (text.includes("bandage")) {
+    return formatResponse("Bandage Waste", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("syrup bottle")) {
+    return formatResponse("Syrup Bottle", "Recycle", "Glass/Plastic", "70% recyclable");
+}
+
+else if (text.includes("capsule strip")) {
+    return formatResponse("Capsule Strip", "Recycle", "Plastic/Aluminium", "40-60% recyclable");
+}
+
+else if (text.includes("shoe sole")) {
+    return formatResponse("Shoe Sole", "Reuse", "Rubber", "50% reusable");
+}
+
+else if (text.includes("leather")) {
+    return formatResponse("Leather Waste", "Reuse", "Fashion", "60% reusable");
+}
+
+else if (text.includes("wallet")) {
+    return formatResponse("Wallet Waste", "Reuse", "Accessories", "60% reusable");
+}
+
+else if (text.includes("school bag")) {
+    return formatResponse("School Bag", "Reuse", "Textile", "70% reusable");
+}
+
+else if (text.includes("id card")) {
+    return formatResponse("ID Card", "Recycle", "Plastic", "50% recyclable");
+}
+
+else if (text.includes("lanyard")) {
+    return formatResponse("Lanyard Waste", "Reuse", "Textile", "70% reusable");
+}
+
+else if (text.includes("rubber band")) {
+    return formatResponse("Rubber Band", "Reuse", "Office", "80% reusable");
+}
+
+else if (text.includes("file folder")) {
+    return formatResponse("File Folder", "Recycle", "Paper", "80% recyclable");
+}
+
+else if (text.includes("notebook")) {
+    return formatResponse("Notebook Waste", "Recycle", "Paper", "80-90% recyclable");
+}
+
+else if (text.includes("calendar")) {
+    return formatResponse("Calendar Waste", "Recycle", "Paper", "80% recyclable");
+}
+
+else if (text.includes("poster")) {
+    return formatResponse("Poster Waste", "Recycle", "Paper", "70% recyclable");
+}
+
+else if (text.includes("ticket")) {
+    return formatResponse("Ticket Waste", "Recycle", "Paper", "70% recyclable");
+}
+
+else if (text.includes("receipt")) {
+    return formatResponse("Receipt Waste", "Dispose", "Thermal paper", "Not recyclable");
+}
+
+else if (text.includes("envelope")) {
+    return formatResponse("Envelope Waste", "Recycle", "Paper", "80% recyclable");
+}
+
+else if (text.includes("stamp")) {
+    return formatResponse("Stamp Waste", "Dispose", "Paper", "Limited recycling");
+}
+
+else if (text.includes("card")) {
+    return formatResponse("Greeting Card", "Recycle", "Paper", "70% recyclable");
+}
+
+else if (text.includes("battery charger")) {
+    return formatResponse("Battery Charger", "E-waste recycle", "Electronics", "60% recyclable");
+}
+
+else if (text.includes("power bank")) {
+    return formatResponse("Power Bank", "E-waste recycle", "Electronics", "50-70% recyclable");
+}
+
+else if (text.includes("drone")) {
+    return formatResponse("Drone Waste", "E-waste recycle", "Electronics", "50% recyclable");
+}
+
+else if (text.includes("game console")) {
+    return formatResponse("Game Console", "E-waste recycle", "Electronics", "60% recyclable");
+}
+
+else if (text.includes("joystick")) {
+    return formatResponse("Joystick Waste", "E-waste recycle", "Electronics", "50% recyclable");
+}
+
+else if (text.includes("vr headset")) {
+    return formatResponse("VR Headset", "E-waste recycle", "Electronics", "50% recyclable");
+}
+
+else if (text.includes("led strip")) {
+    return formatResponse("LED Strip", "E-waste recycle", "Electronics", "60% recyclable");
+}
+
+else if (text.includes("solar panel")) {
+    return formatResponse("Solar Panel", "Special recycling", "Energy", "70-90% recyclable");
+}
+
+else if (text.includes("inverter")) {
+    return formatResponse("Inverter Waste", "E-waste recycle", "Electronics", "60% recyclable");
+}
+
+else if (text.includes("ups")) {
+    return formatResponse("UPS Waste", "E-waste recycle", "Electronics", "60% recyclable");
+}
+else if (text.includes("diaper") || text.includes("nappy")) {
+    return formatResponse("Diaper Waste", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("sanitary pad")) {
+    return formatResponse("Sanitary Pad", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("tampon")) {
+    return formatResponse("Tampon Waste", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("tissue")) {
+    return formatResponse("Tissue Paper", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("wet wipes")) {
+    return formatResponse("Wet Wipes", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("cotton buds")) {
+    return formatResponse("Cotton Buds", "Dispose", "Personal care", "Not recyclable");
+}
+
+else if (text.includes("cotton pads")) {
+    return formatResponse("Cotton Pads", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("band aid")) {
+    return formatResponse("Band Aid", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("face mask")) {
+    return formatResponse("Face Mask", "Dispose", "Medical", "Limited recycling");
+}
+
+else if (text.includes("gloves")) {
+    return formatResponse("Gloves", "Dispose", "Medical", "Limited recycling");
+}
+
+else if (text.includes("hair clip")) {
+    return formatResponse("Hair Clip", "Recycle", "Plastic/Metal", "50% recyclable");
+}
+
+else if (text.includes("hair band")) {
+    return formatResponse("Hair Band", "Reuse", "Rubber", "70% reusable");
+}
+
+else if (text.includes("shaving blade")) {
+    return formatResponse("Shaving Blade", "Dispose", "Metal", "Not recyclable");
+}
+
+else if (text.includes("razor")) {
+    return formatResponse("Razor Waste", "Dispose", "Plastic/Metal", "Limited recycling");
+}
+
+else if (text.includes("toilet paper")) {
+    return formatResponse("Toilet Paper", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("napkin")) {
+    return formatResponse("Napkin Waste", "Dispose", "Sanitary", "Not recyclable");
+}
+
+else if (text.includes("medical waste")) {
+    return formatResponse("Medical Waste", "Hazardous disposal", "Healthcare", "Not recyclable");
+}
+
+else if (text.includes("syringe")) {
+    return formatResponse("Syringe", "Hazardous disposal", "Medical", "Not recyclable");
+}
+
+else if (text.includes("iv tube")) {
+    return formatResponse("IV Tube", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("blood bag")) {
+    return formatResponse("Blood Bag", "Hazardous disposal", "Medical", "Not recyclable");
+}
+
+else if (text.includes("urine bag")) {
+    return formatResponse("Urine Bag", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("test kit")) {
+    return formatResponse("Test Kit", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("thermometer")) {
+    return formatResponse("Thermometer", "Hazardous disposal", "Medical", "Not recyclable");
+}
+
+else if (text.includes("medicine strip")) {
+    return formatResponse("Medicine Strip", "Recycle", "Plastic/Aluminium", "40-60% recyclable");
+}
+
+else if (text.includes("capsule")) {
+    return formatResponse("Capsule Waste", "Dispose", "Medical", "Not recyclable");
+}
+
+else if (text.includes("syrup")) {
+    return formatResponse("Syrup Bottle", "Recycle", "Glass/Plastic", "70% recyclable");
+}
+
+else if (text.includes("ointment")) {
+    return formatResponse("Ointment Tube", "Dispose", "Medical", "Limited recycling");
+}
+
+else if (text.includes("tablet cover")) {
+    return formatResponse("Tablet Cover", "Recycle", "Plastic", "50% recyclable");
+}
+
+else if (text.includes("face wash tube")) {
+    return formatResponse("Face Wash Tube", "Recycle", "Plastic", "60% recyclable");
+}
+
+else if (text.includes("cream bottle")) {
+    return formatResponse("Cream Bottle", "Recycle", "Plastic", "60% recyclable");
+}
+
+else if (text.includes("lotion bottle")) {
+    return formatResponse("Lotion Bottle", "Recycle", "Plastic", "60% recyclable");
+}
+
+else if (text.includes("handwash bottle")) {
+    return formatResponse("Handwash Bottle", "Recycle", "Plastic", "70% recyclable");
+}
+
+else if (text.includes("sanitizer bottle")) {
+    return formatResponse("Sanitizer Bottle", "Recycle", "Plastic", "70% recyclable");
+}
+
+else if (text.includes("perfume spray")) {
+    return formatResponse("Perfume Spray", "Recycle", "Glass/Metal", "70% recyclable");
+}
+
+else if (text.includes("deodorant")) {
+    return formatResponse("Deodorant Can", "Recycle", "Metal", "80% recyclable");
+}
+
+else if (text.includes("lip balm")) {
+    return formatResponse("Lip Balm", "Dispose", "Plastic", "Limited recycling");
+}
+
+else if (text.includes("comb")) {
+    return formatResponse("Comb", "Recycle", "Plastic", "50% recyclable");
+}
+
+else if (text.includes("mirror")) {
+    return formatResponse("Mirror", "Dispose", "Glass", "Limited recycling");
+}
+
+else if (text.includes("hanger")) {
+    return formatResponse("Cloth Hanger", "Reuse", "Plastic/Metal", "70% reusable");
+}
+
+else if (text.includes("clip")) {
+    return formatResponse("Clip Waste", "Reuse", "Metal", "80% reusable");
+}
+
+else if (text.includes("safety pin")) {
+    return formatResponse("Safety Pin", "Reuse", "Metal", "90% reusable");
+}
+
+else if (text.includes("needle")) {
+    return formatResponse("Needle", "Hazardous disposal", "Medical", "Not recyclable");
+}
+
+else if (text.includes("thread")) {
+    return formatResponse("Thread Waste", "Reuse", "Textile", "60% reusable");
+}
+
+else if (text.includes("fabric")) {
+    return formatResponse("Fabric Waste", "Reuse", "Textile", "70% reusable");
+}
+
+else if (text.includes("old clothes")) {
+    return formatResponse("Old Clothes", "Reuse/Donate", "Textile", "80% reusable");
+}
+
+else if (text.includes("blanket")) {
+    return formatResponse("Blanket Waste", "Reuse", "Textile", "70% reusable");
+}
+
+else if (text.includes("pillow")) {
+    return formatResponse("Pillow Waste", "Reuse", "Textile", "60% reusable");
+}
+
+else if (text.includes("mattress")) {
+    return formatResponse("Mattress Waste", "Recycle", "Furniture", "60% reusable");
+}
+
+else if (text.includes("carpet")) {
+    return formatResponse("Carpet Waste", "Reuse", "Textile", "60% reusable");
+}
+
+else if (text.includes("curtain")) {
+    return formatResponse("Curtain Waste", "Reuse", "Textile", "70% reusable");
+}
 
     else {
         return "I don't have info on that yet. Try asking about:<br><br>• Plastic, Paper, Glass, Metal<br>• Food, Wood, Organic waste<br>• Electronics, Batteries<br>• Or type 'help' for suggestions!";
@@ -1052,7 +1640,55 @@ document.getElementById("userInput").addEventListener("keypress", function(e) {
         sendMessage();
     }
 });
+// Toggle History Panel
+function toggleHistory() {
+    document.getElementById("historyPanel").classList.toggle("active");
+}
 
+function saveToHistory(chat) {
+    let history = JSON.parse(localStorage.getItem("ecoHistory")) || [];
+
+    // ✅ Add current time
+    chat.time = new Date().getTime();
+
+    history.unshift(chat);
+
+    localStorage.setItem("ecoHistory", JSON.stringify(history));
+
+    loadHistory();
+}
+
+
+function loadHistory() {
+    let history = JSON.parse(localStorage.getItem("ecoHistory")) || [];
+    let list = document.getElementById("historyList");
+
+    list.innerHTML = "";
+
+    let now = new Date().getTime();
+
+    // ✅ Keep only last 24 hours
+    history = history.filter(item => (now - item.time) <= 86400000);
+
+    // ✅ Update cleaned data
+    localStorage.setItem("ecoHistory", JSON.stringify(history));
+
+    history.forEach(item => {
+        let li = document.createElement("li");
+        let timeString = getTimeAgo(item.time);
+
+        li.innerHTML = `
+            <b>You:</b> ${item.user}<br>
+            <b>Bot:</b> ${item.bot}<br>
+            <small>${timeString}</small>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+// Load when page opens
+window.onload = loadHistory;
 </script>
 <script src="script.js"></script>
 

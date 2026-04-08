@@ -130,3 +130,43 @@ function showToast(message) {
         toast.remove();
     }, 3000);
 }
+// SCROLL TO BOTTOM FUNCTION
+function scrollToBottom() {
+    let chatBox = document.getElementById("chatBox");
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// SHOW / HIDE BUTTON
+let chatBox = document.getElementById("chatBox");
+let scrollBtn = document.getElementById("scrollBtn");
+
+chatBox.addEventListener("scroll", function () {
+    if (chatBox.scrollTop < chatBox.scrollHeight - chatBox.clientHeight - 50) {
+        scrollBtn.style.display = "block";
+    } else {
+        scrollBtn.style.display = "none";
+    }
+});
+
+// AUTO SCROLL WHEN NEW MESSAGE COMES
+function addMessageToChat(text) {
+    let chatBox = document.getElementById("chatBox");
+
+    let msg = document.createElement("div");
+    msg.className = "user-message";
+    msg.innerHTML = text;
+
+    chatBox.appendChild(msg);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+function getTimeAgo(timestamp) {
+    let now = new Date().getTime();
+    let diff = Math.floor((now - timestamp) / 1000); // seconds
+
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return Math.floor(diff / 60) + " min ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + " hrs ago";
+
+    return Math.floor(diff / 86400) + " days ago";
+}
