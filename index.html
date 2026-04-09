@@ -1677,35 +1677,55 @@ function saveToHistory(chat) {
 
 
 function loadHistory() {
-    let history = JSON.parse(localStorage.getItem("ecoHistory")) || [];
-    let list = document.getElementById("historyList");
 
+    let user = localStorage.getItem("loggedUser");
+    if (!user) return;
+
+    let key = "ecoHistory_" + user;
+
+    let history = JSON.parse(localStorage.getItem(key)) || [];
+
+    let list = document.getElementById("historyList");
     list.innerHTML = "";
 
     let now = new Date().getTime();
 
-    // ✅ Keep only last 24 hours
+    // keep only 24 hours
     history = history.filter(item => (now - item.time) <= 86400000);
 
-    // ✅ Update cleaned data
-    localStorage.setItem("ecoHistory", JSON.stringify(history));
+    localStorage.setItem(key, JSON.stringify(history));
 
     history.forEach(item => {
         let li = document.createElement("li");
-        let timeString = getTimeAgo(item.time);
 
         li.innerHTML = `
             <b>You:</b> ${item.user}<br>
-            <b>Bot:</b> ${item.bot}<br>
-            <small>${timeString}</small>
+            <b>Bot:</b> ${item.bot}
         `;
 
         list.appendChild(li);
     });
 }
+function saveToHistory(chat) {
 
-// Load when page opens
-window.onload = loadHistory;
+    let user = localStorage.getItem("loggedUser");
+    if (!user) return;
+
+    let key = "ecoHistory_" + user;
+
+    let history = JSON.parse(localStorage.getItem(key)) || [];
+
+    chat.time = new Date().getTime();
+
+    history.unshift(chat);
+
+    localStorage.setItem(key, JSON.stringify(history));
+
+    loadHistory();
+}
+window.addEventListener("load", function () {
+    loadHistory();
+});
 </script>
 <script src="script.js"></script>
 <script src="auth.js"></script>
