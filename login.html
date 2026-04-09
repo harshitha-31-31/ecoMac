@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: #e8f5e9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:300px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:green;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Login</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+</div>
+
+<script>
+function login(){
+
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+
+    if(user === "" || pass === ""){
+        alert("Fill all fields");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+
+    let currentTime = new Date().getTime();
+
+    // if user exists
+    if(users[user]){
+
+        let expiry = users[user].expiry;
+
+        // if expired (7 days)
+        if(currentTime > expiry){
+            delete users[user];
+            localStorage.setItem("users", JSON.stringify(users));
+            alert("Account expired. Create again.");
+            return;
+        }
+
+        // check password
+        if(users[user].password !== pass){
+            alert("Wrong password");
+            return;
+        }
+
+    } else {
+        // new user create
+        let oneWeek = 7 * 24 * 60 * 60 * 1000;
+
+        users[user] = {
+            password: pass,
+            expiry: currentTime + oneWeek
+        };
+
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    // login success
+    localStorage.setItem("loggedUser", user);
+    window.location.href = "app.html";
+}
+</script>
+
+</body>
+</html>

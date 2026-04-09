@@ -130,11 +130,7 @@ function showToast(message) {
         toast.remove();
     }, 3000);
 }
-// SCROLL TO BOTTOM FUNCTION
-function scrollToBottom() {
-    let chatBox = document.getElementById("chatBox");
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+
 
 // SHOW / HIDE BUTTON
 let chatBox = document.getElementById("chatBox");
@@ -170,3 +166,23 @@ function getTimeAgo(timestamp) {
 
     return Math.floor(diff / 86400) + " days ago";
 }
+// ✅ SCROLL BUTTON FIX (SAFE VERSION)
+function initScrollButton() {
+    let chatBox = document.getElementById("chatBox");
+    let scrollBtn = document.getElementById("scrollBtn");
+
+    if (!chatBox || !scrollBtn) return;
+
+    chatBox.addEventListener("scroll", function () {
+        let maxScroll = chatBox.scrollHeight - chatBox.clientHeight;
+
+        if (chatBox.scrollTop < maxScroll - 50) {
+            scrollBtn.style.display = "block";
+        } else {
+            scrollBtn.style.display = "none";
+        }
+    });
+}
+
+// run safely after page loads
+document.addEventListener("DOMContentLoaded", initScrollButton);
